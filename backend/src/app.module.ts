@@ -10,6 +10,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseOptions } from './database/database.config';
 import { SubjectsModule } from './subjects/subjects.module';
 import { EnrollmentsModule } from './enrollments/enrollments.module';
+import { GradesModule } from './grades/grades.module';
+import { GradeInquiriesModule } from './grade-inquiries/grade-inquiries.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -19,6 +22,9 @@ import { EnrollmentsModule } from './enrollments/enrollments.module';
     AuthModule,
     SubjectsModule,
     EnrollmentsModule,
+    GradesModule,
+    GradeInquiriesModule,
+    UsersModule,
     ThrottlerModule.forRoot({
       ipv6SubnetPrefix: 128,
       throttlers: [

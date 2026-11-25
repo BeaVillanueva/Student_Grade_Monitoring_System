@@ -9,7 +9,8 @@ This is a single-department prototype with one current faculty assignment per Su
 Authentication and role guards are now implemented in Step 9; see
 [authentication security](authentication-security.md). Subjects CRUD is implemented in
 [Step 10](subjects-api.md), and Enrollments CRUD in [Step 11](enrollments-api.md).
-Grades, Grade Inquiries, User management APIs, and frontend work remain deferred.
+Grades, Grade Inquiries, and User management APIs are implemented in
+[Step 12](remaining-modules-api.md). The original schema remains unchanged; frontend work remains deferred.
 
 ## Connection and operational safety
 

@@ -10,7 +10,8 @@ JWT login and protected profile retrieval, reusable role guards, validation, and
 limits. Subjects CRUD provides role permissions, bounded pagination, academic-history
 restrictions, and transactional audit logging. Enrollments CRUD now enforces Student/
 Faculty ownership, immutable enrollment dates, grade-history protection, and atomic audits.
-Grades, Grade Inquiries, User management, and frontend implementation remain deferred.
+Grades, Grade Inquiries, and Admin-only User management now complete the planned
+22-endpoint backend. Frontend and final Postman collection preparation remain deferred.
 
 See [database design and verification](docs/database-design.md) for the full schema,
 corrected ERD, domain constraints, seed controls, and documented limitations.
@@ -20,6 +21,8 @@ See [Subjects API](docs/subjects-api.md) for all five endpoints, validation, per
 request/response examples, and transactional audit behavior.
 See [Enrollments API](docs/enrollments-api.md) for ownership filtering, all five endpoints,
 date/term rules, auditing, and independent-connection concurrency tests.
+See [remaining module APIs](docs/remaining-modules-api.md) and the
+[22-route inventory](docs/route-inventory.md) for Grades, Inquiries, Users, and account protections.
 
 ## Stack and local configuration
 
