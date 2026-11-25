@@ -1,0 +1,22 @@
+# Reference documents contain personal information.
+/references/
+*.pdf
+
+# Dependencies and generated output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Local credentials and environment configuration
+.env
+.env.*
+!.env.example
+
+# Local logs, database dumps, and editor files
+*.log
+*.sql
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
