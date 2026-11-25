@@ -17,4 +17,5 @@ Database connections, six entities, explicit migrations, and a fictional demo se
 are implemented. See [database documentation](../docs/database-design.md).
 JWT login, protected profile retrieval, reusable guards, validation, and rate limiting
 are implemented. See [authentication documentation](../docs/authentication-security.md).
-Academic CRUD API modules remain deferred.
+Subjects CRUD and transactional audit logging are implemented; see
+[Subjects API](../docs/subjects-api.md). Other academic CRUD API modules remain deferred.

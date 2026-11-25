@@ -14,16 +14,15 @@ export class SafeHttpExceptionFilter implements ExceptionFilter {
       403: 'Forbidden',
       404: 'Not found',
       405: 'Method not allowed',
+      409: 'Conflict',
       413: 'Request too large',
       415: 'Unsupported media type',
       429: 'Too many requests',
     };
     // Do not echo payloads, tokens, URLs, SQL, stack traces, or internal error messages.
-    response
-      .status(status)
-      .json({
-        statusCode: status,
-        message: messages[status] ?? 'Internal server error',
-      });
+    response.status(status).json({
+      statusCode: status,
+      message: messages[status] ?? 'Internal server error',
+    });
   }
 }

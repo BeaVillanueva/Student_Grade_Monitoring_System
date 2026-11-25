@@ -7,12 +7,16 @@ Individual final project for ITEC 116 — Systems Integration and Architecture 2
 Database implementation is complete: six TypeORM entities, an explicit migration,
 isolated MariaDB accounts, and a controlled fictional seed. Authentication provides
 JWT login and protected profile retrieval, reusable role guards, validation, and rate
-limits. Academic CRUD API modules and frontend implementation remain deferred.
+limits. Subjects CRUD provides role permissions, bounded pagination, academic-history
+restrictions, and transactional audit logging. Other academic CRUD modules and frontend
+implementation remain deferred.
 
 See [database design and verification](docs/database-design.md) for the full schema,
 corrected ERD, domain constraints, seed controls, and documented limitations.
 See [authentication and security](docs/authentication-security.md) for endpoint examples,
 token configuration, reusable guards, tests, and the local HTTP limitation.
+See [Subjects API](docs/subjects-api.md) for all five endpoints, validation, permissions,
+request/response examples, and transactional audit behavior.
 
 ## Stack and local configuration
 

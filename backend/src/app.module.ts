@@ -8,6 +8,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
 import { SafeHttpExceptionFilter } from './common/http-exception.filter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseOptions } from './database/database.config';
+import { SubjectsModule } from './subjects/subjects.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { databaseOptions } from './database/database.config';
       useFactory: () => ({ ...databaseOptions(), retryAttempts: 1 }),
     }),
     AuthModule,
+    SubjectsModule,
     ThrottlerModule.forRoot({
       ipv6SubnetPrefix: 128,
       throttlers: [
