@@ -6,7 +6,8 @@ Implemented for ITEC 116 using Laboratory Activity 04 (five handwritten pages),
 the final-project requirements, the Phase 1 corrections, and the approved domain rules.
 MariaDB 10.4.32 is the approved MySQL-compatible database substitution.
 This is a single-department prototype with one current faculty assignment per Subject.
-No authentication, authorization service, CRUD API module, or frontend is implemented.
+Authentication and role guards are now implemented in Step 9; see
+[authentication security](authentication-security.md). Academic CRUD and frontend remain deferred.
 
 ## Connection and operational safety
 

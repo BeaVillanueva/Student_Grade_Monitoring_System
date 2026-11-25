@@ -9,10 +9,12 @@ Run commands from this directory:
 npm.cmd ci
 npm.cmd run build
 npm.cmd test -- --runInBand
+npm.cmd run test:e2e -- --runInBand
 npm.cmd run start:dev
 ```
 
-The initial application contains only the generated sample controller and service.
 Database connections, six entities, explicit migrations, and a fictional demo seed
 are implemented. See [database documentation](../docs/database-design.md).
-Authentication and functional REST API modules remain deferred.
+JWT login, protected profile retrieval, reusable guards, validation, and rate limiting
+are implemented. See [authentication documentation](../docs/authentication-security.md).
+Academic CRUD API modules remain deferred.

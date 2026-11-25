@@ -22,7 +22,8 @@
     "migration:run": "typeorm migration:run -d dist/database/data-source.js",
     "migration:show": "typeorm migration:show -d dist/database/data-source.js",
     "seed:demo": "node dist/database/seeds/demo.seed.js",
-    "test:database": "node dist/database/verify-database.js"
+    "test:database": "node dist/database/verify-database.js",
+    "auth:configure-secret": "node scripts/configure-jwt-secret.mjs"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
