@@ -4,9 +4,13 @@ Individual final project for ITEC 116 — Systems Integration and Architecture 2
 
 ## Current scope
 
-Backend initialization only. The generated sample controller and service are not
-functional SGMS modules. No database connection, entities, authentication, functional
-modules, or frontend are implemented.
+Database implementation is complete: six TypeORM entities, an explicit migration,
+isolated MariaDB accounts, and a controlled fictional seed. The generated sample
+controller and service are not functional SGMS modules. Authentication, CRUD API
+modules, and frontend implementation remain deferred.
+
+See [database design and verification](docs/database-design.md) for the full schema,
+corrected ERD, domain constraints, seed controls, and documented limitations.
 
 ## Stack and planned configuration
 
@@ -28,22 +32,28 @@ Initialization used Node.js 24.21.0 and npm 11.19.0. From the project root:
 Set-Location backend
 npm.cmd ci
 npm.cmd run build
+npm.cmd run migration:show
+npm.cmd run test:database
 npm.cmd test -- --runInBand
 npm.cmd run start:dev
 ```
 
 Check port availability before starting the backend. It defaults to loopback port
-3000. The scaffold reads HOST and PORT from the process environment. `.env.example`
-contains planned settings and blank credentials; environment-file loading and
-database wiring are deferred. Installed security dependencies are not yet active.
+3000. Database configuration loads the local ignored `backend/.env`. `.env.example`
+contains nonsecret settings and blank passwords. Runtime database connections use
+the dedicated DML-only SGMS account. Synchronization and automatic migrations are
+disabled. Installed authentication and rate-limiting dependencies are not yet active.
 
-Do not create the database or run migrations until database implementation is approved.
+The approved database has been provisioned and migrated. Do not rerun provisioning
+against an existing database; it deliberately refuses existing targets. Subsequent
+schema changes require an approved forward migration. Demo passwords are generated
+locally and saved in ignored `backend/.env.demo`; never share or commit that file.
 
 ## Workspace privacy
 
 Root `.htaccess` denies direct Apache HTTP access to SGMS. This requires Apache 2.4
 to honor local rules; the inspected XAMPP document-root configuration permits overrides.
-Runtime verification requires Apache to be running and has not been performed.
+Runtime verification confirmed HTTP 403 for SGMS and both local credential files.
 NestJS runs independently of Apache.
 
 Reference PDFs contain personal information and are excluded from Git. Environment

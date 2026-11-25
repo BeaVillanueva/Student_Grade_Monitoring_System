@@ -13,5 +13,6 @@ npm.cmd run start:dev
 ```
 
 The initial application contains only the generated sample controller and service.
-Database connections, entities, authentication, and functional modules are deferred.
-Installing dependencies does not activate those features.
+Database connections, six entities, explicit migrations, and a fictional demo seed
+are implemented. See [database documentation](../docs/database-design.md).
+Authentication and functional REST API modules remain deferred.
