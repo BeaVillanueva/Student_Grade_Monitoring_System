@@ -8,7 +8,8 @@ MariaDB 10.4.32 is the approved MySQL-compatible database substitution.
 This is a single-department prototype with one current faculty assignment per Subject.
 Authentication and role guards are now implemented in Step 9; see
 [authentication security](authentication-security.md). Subjects CRUD is implemented in
-[Step 10](subjects-api.md); other academic CRUD and frontend work remain deferred.
+[Step 10](subjects-api.md), and Enrollments CRUD in [Step 11](enrollments-api.md).
+Grades, Grade Inquiries, User management APIs, and frontend work remain deferred.
 
 ## Connection and operational safety
 

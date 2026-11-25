@@ -18,4 +18,6 @@ are implemented. See [database documentation](../docs/database-design.md).
 JWT login, protected profile retrieval, reusable guards, validation, and rate limiting
 are implemented. See [authentication documentation](../docs/authentication-security.md).
 Subjects CRUD and transactional audit logging are implemented; see
-[Subjects API](../docs/subjects-api.md). Other academic CRUD API modules remain deferred.
+[Subjects API](../docs/subjects-api.md). Enrollments CRUD is implemented with ownership
+and academic-history restrictions; see [Enrollments API](../docs/enrollments-api.md).
+Grades, Grade Inquiries, and User management APIs remain deferred.

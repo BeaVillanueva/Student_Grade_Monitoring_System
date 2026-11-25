@@ -2,7 +2,8 @@
 
 Implemented from Laboratory Activity 06 and the final-project authentication requirements.
 Step 9 introduced two authentication endpoints. Step 10 adds the five protected
-[Subjects CRUD endpoints](subjects-api.md). The scaffold Hello World endpoint was
+[Subjects CRUD endpoints](subjects-api.md), and Step 11 adds five ownership-scoped
+[Enrollments CRUD endpoints](enrollments-api.md). The scaffold Hello World endpoint was
 removed; authentication itself added no academic CRUD controller or schema migration.
 
 ## Endpoints
@@ -151,8 +152,9 @@ secret. It refuses to overwrite an unexpected existing value. Never commit `.env
   exposing internal configuration. This intentionally limits diagnostics in this prototype.
 
 Role authorization does not replace ownership checks. Subjects now validates active
-faculty assignments and protects graded academic history. Future Enrollment/Grade
-services must still enforce student ownership and faculty scope. The authentication
+faculty assignments and protects graded academic history. Enrollments now enforces
+Student ownership and Faculty assignment scope. Future Grade services must apply their
+own ownership checks as well. The authentication
 read/login endpoints themselves introduce no academic mutation or audit workflow.
 
 ## Rate limits

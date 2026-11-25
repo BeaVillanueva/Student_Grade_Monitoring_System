@@ -358,7 +358,9 @@ describe('Authentication and access security (MariaDB transaction fixtures)', ()
       message: 'Too many requests',
     });
     expect(Number(response.headers['retry-after-login'])).toBeGreaterThan(0);
-  });
+    // Five real cost-12 bcrypt comparisons need a bounded budget on a busy host.
+    // This changes only Jest's deadline, not the production rate limit or hashing cost.
+  }, 20_000);
 
   it('applies the general 100-per-minute limit across protected route handlers', async () => {
     for (let i = 0; i < 100; i++) await me().expect(401);

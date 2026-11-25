@@ -9,6 +9,7 @@ import { SafeHttpExceptionFilter } from './common/http-exception.filter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseOptions } from './database/database.config';
 import { SubjectsModule } from './subjects/subjects.module';
+import { EnrollmentsModule } from './enrollments/enrollments.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SubjectsModule } from './subjects/subjects.module';
     }),
     AuthModule,
     SubjectsModule,
+    EnrollmentsModule,
     ThrottlerModule.forRoot({
       ipv6SubnetPrefix: 128,
       throttlers: [
