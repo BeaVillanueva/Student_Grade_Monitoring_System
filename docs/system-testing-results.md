@@ -1,6 +1,6 @@
 # Consolidated testing evidence
 
-These historical results were not rerun during Step 14.14B. Keep each measurement separate.
+The opening table preserves historical results reviewed during Step 14.14B. Later Step 14.14C.2 UI regression results are recorded separately below. Steps 14.14C.3 and 14.14C.3A reused the approved test/build evidence rather than rerunning it. Keep scenarios, assertions, requests, mocked mutations and audit counts separate.
 
 | Evidence/provenance              | Result                                                                                                  | Scope                                                                 |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
@@ -118,3 +118,13 @@ pairs, and 192 script syntax checks. It checked 24 positive and nine negative DT
 offline mutation/cooldown guards. Credential/token slots were empty; allowTestWrites=false,
 rateMode=off and runExpiredTokenTest=false. These were offline checks, not live API execution or new
 Postman assertions. They were not rerun as live tests during Step 14.14B.
+
+## Final approved UI regression and process reconciliation
+
+Final approved UI regression — Step 14.14C.2 (27 November 2026): 89/89 frontend tests passed with zero failures or skips; TypeScript validation and the production build passed. The successful four-role live pass used 37 API requests: four login POSTs and 33 GETs, with no academic writes, runtime exceptions or HTTP 429 responses. Separately, 21 functional fixture checks used 60 intercepted requests and 10 mocked mutations; eight edge-case checks used 24 intercepted requests and zero mutations. All fixture API traffic was fulfilled locally and caused no live backend mutation. Representative widths were 320, 375, 768, 1024, 1366 and 1920 pixels. Chart counts and percentages matched authorized API responses; missing grades remained Not recorded, distinct from 0.00. Browser and accessibility checks were representative, not certification.
+
+Commit 10, 9b754a35ba1866d3e3babb303df9fb8f01ebdcbb, recorded exactly 15 approved UI/test files. Focused checks found no secrets in the 15 staged files, final 193 tracked files or 15 newly reachable Git blobs; this is not an all-history secret certification. The initial post-commit process-preservation halt was reconciled in Step 14.14C.3A: the current original backend's absolute application path, original Nest watch ancestry, unchanged source/configuration, loopback listener and availability were verified. The exact historical PID replacement trigger remains unconfirmed. No service was restarted or database scan performed during reconciliation.
+
+Eleven new live rendered screenshots cover login, four role dashboards, User Management, Enrollment and four representative mobile layouts. They supersede corresponding older illustrations for future academic selection while all historical originals remain preserved privately. Older indexed screenshot totals retain their historical meaning. Fixture-only screenshots must be labeled synthetic test data. No private screenshot, raw report or backup is included in the public repository. Historical database snapshots and pending-inquiry values are not fresh database findings.
+
+Representative role isolation, navigation, logout, dialogs, validation, pagination and table action alignment checks passed during Step 14.14C.2. These approved results were reused during Step 14.14C.4; application tests and builds were not rerun for this documentation update.

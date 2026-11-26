@@ -25,9 +25,11 @@ and historical development evidence. The design preview /__dev/design-system is 
 Local Radix/shadcn-style components, Tailwind semantic tokens and Lucide icons are implemented.
 Recharts is not installed.
 
-Historical final verification: 86/86 offline frontend tests, production typecheck/build pass; 59/59
-actual isolated functional scenarios and separate 253/253 behavioral checks. These are different
-metrics and were not rerun for this documentation review. User-reported Postman results are
+Shared SVG charts display authorized enrollment and inquiry distributions, grade-type counts and personal Midterm/Final scores. Missing grades display Not recorded; recorded zero displays 0.00. Table actions use consistent compact sizing, with equal Activate/Deactivate widths. Panels refresh every five minutes, guarded against overlapping work, open dialogs, hidden tabs and offline clients. Automatic panel refresh does not persist access tokens or preserve login after a full browser reload.
+
+Historical Step 14.13 verification recorded 86/86 offline frontend tests and successful production TypeScript/build checks. Separate historical runs recorded 59/59 actual isolated functional scenarios and 253/253 behavioral security checks. Step 14.14C.2 subsequently passed 89/89 frontend tests with no failures or skips, TypeScript validation and the production build. Its successful four-role live pass used 37 API requests without academic writes, runtime exceptions or rate-limit responses. Separately, 21 intercepted functional fixture checks, including 10 mocked mutations, and eight intercepted edge-case checks passed; fixture writes did not reach the backend. Steps 14.14C.3 and 14.14C.3A reused these results without rerunning the tests or build. These measurements have different scopes and must not be added together.
+
+User-reported Postman results are
 separately documented. Representative headless-Chrome viewport checks are not comprehensive
 device/browser/accessibility certification. See root README and consolidated testing documentation
 for known limits and failed-harness/retest provenance.
