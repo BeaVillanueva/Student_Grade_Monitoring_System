@@ -7,6 +7,10 @@ node_modules/
 dist/
 coverage/
 *.tsbuildinfo
+# Local Vite caches (defence in depth; not submission artifacts)
+frontend/.vite/
+frontend/.vite-temp/
+frontend/node_modules/.vite/
 
 # Local credentials and environment configuration
 .env
