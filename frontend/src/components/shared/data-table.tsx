@@ -52,7 +52,10 @@ export function DataTable<T>({
                 </th>
               ))}
               {actions && (
-                <th scope="col" className="px-4 py-3 text-right">
+                <th
+                  scope="col"
+                  className="w-px whitespace-nowrap px-4 py-3 text-center"
+                >
                   Actions
                 </th>
               )}
@@ -62,7 +65,10 @@ export function DataTable<T>({
             {!loading &&
               !error &&
               rows.map((row) => (
-                <tr key={rowKey(row)} className="border-t hover:bg-background">
+                <tr
+                  key={rowKey(row)}
+                  className="border-t hover:bg-background"
+                >
                   {columns.map((col) => (
                     <td
                       key={col.key}
@@ -72,7 +78,11 @@ export function DataTable<T>({
                     </td>
                   ))}
                   {actions && (
-                    <td className="px-4 py-3 text-right">{actions(row)}</td>
+                    <td className="w-px whitespace-nowrap px-4 py-3 text-center align-middle">
+                      <div className="inline-flex flex-nowrap items-center justify-center gap-2 [&>div]:contents [&_button]:h-9 [&_button]:min-h-9 [&_button]:whitespace-nowrap [&_button]:rounded-md [&_button]:px-3 [&_button]:py-0 [&_button]:text-sm [&_button]:font-medium [&_button]:leading-5">
+                        {actions(row)}
+                      </div>
+                    </td>
                   )}
                 </tr>
               ))}

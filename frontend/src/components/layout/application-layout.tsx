@@ -8,13 +8,16 @@ import {
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
-  RefreshCw,
   UserRound,
   X,
 } from "lucide-react";
 import { useAuth } from "@/auth/auth-provider";
 import { ROLE_PATHS } from "@/auth/policies";
-import { currentNavigation, profilePath, userInitials } from "@/app/navigation";
+import {
+  currentNavigation,
+  profilePath,
+  userInitials,
+} from "@/app/navigation";
 import { Button } from "@/components/ui/button";
 import { Alert, Avatar } from "@/components/ui/display";
 import {
@@ -27,13 +30,18 @@ import {
 import { Sidebar } from "./sidebar";
 import { cn } from "@/lib/utils";
 import { ToastProvider } from "@/components/ui/toast";
+import { useDashboardRefresh } from "@/features/shared/use-dashboard-refresh";
 
 export function ApplicationLayout() {
   const auth = useAuth();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  useDashboardRefresh(
+    () => auth.refreshIdentity(),
+    auth.status === "authenticated",
+    false,
+  );
   useEffect(() => {
     setDrawerOpen(false);
   }, [location.pathname]);
@@ -57,14 +65,6 @@ export function ApplicationLayout() {
   const logout = () => {
     setDrawerOpen(false);
     void auth.logout();
-  };
-  const refresh = async () => {
-    setRefreshing(true);
-    try {
-      await auth.refreshIdentity(true);
-    } finally {
-      setRefreshing(false);
-    }
   };
   return (
     <TooltipProvider delayDuration={250}>
@@ -188,15 +188,6 @@ export function ApplicationLayout() {
                         <UserRound className="size-4" aria-hidden="true" />
                         My Profile
                       </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      disabled={refreshing}
-                      onSelect={() => void refresh()}
-                    >
-                      <RefreshCw className="size-4" aria-hidden="true" />
-                      {refreshing
-                        ? "Refreshing account…"
-                        : "Refresh account information"}
                     </DropdownMenuItem>
                     <DropdownMenuItem onSelect={logout}>
                       <LogOut className="size-4" aria-hidden="true" />

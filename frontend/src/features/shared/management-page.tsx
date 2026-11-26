@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, queryOptions } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
-import { Plus, RefreshCw } from "lucide-react";
+import { Plus } from "lucide-react";
+import { useDashboardRefresh } from "./use-dashboard-refresh";
 import type {
   CreateEnrollmentRequest,
   CreateSubjectRequest,
@@ -122,7 +123,8 @@ export function ManagementPage({
     repo.page(resource, {
       page,
       pageSize,
-      ...(["grades", "inquiries", "enrollments"].includes(resource) && studentId
+      ...(["grades", "inquiries", "enrollments"].includes(resource) &&
+      studentId
         ? { studentId }
         : {}),
     }),
@@ -164,7 +166,10 @@ export function ManagementPage({
         subjects.map((subject) => [subject.subjectId, subject]),
       ),
       enrollments: new Map(
-        (enrollmentRefs.data?.rows ?? []).map((row) => [row.enrollmentId, row]),
+        (enrollmentRefs.data?.rows ?? []).map((row) => [
+          row.enrollmentId,
+          row,
+        ]),
       ),
       grades: new Map(
         (gradeRefs.data?.rows ?? []).map((row) => [row.gradeId, row]),
@@ -213,6 +218,16 @@ export function ManagementPage({
       ...refQueries.map((item) => item.refetch()),
     ]);
   };
+  useDashboardRefresh(
+    refresh,
+    true,
+    query.isFetching ||
+      mutation.isPending ||
+      opening ||
+      Boolean(editor) ||
+      Boolean(view) ||
+      refQueries.some((item) => item.isFetching),
+  );
   const perform = async (
     operation: () => Promise<unknown>,
     message: string,
@@ -226,7 +241,10 @@ export function ManagementPage({
         403,
       );
     if (work.current)
-      throw new ApiError("validation", "A request is already being processed.");
+      throw new ApiError(
+        "validation",
+        "A request is already being processed.",
+      );
     const scope = foundation.getScope();
     work.current = operation;
     try {
@@ -333,7 +351,10 @@ export function ManagementPage({
       await perform(
         () =>
           id
-            ? foundation.services.users.update(id, values as UpdateUserRequest)
+            ? foundation.services.users.update(
+                id,
+                values as UpdateUserRequest,
+              )
             : foundation.services.users.create(
                 values as unknown as CreateUserRequest,
               ),
@@ -375,35 +396,11 @@ export function ManagementPage({
       : null;
   return (
     <>
-      <PageHeader
-        title={heading}
-        description={description}
-        actions={
-          <>
-            <Button
-              variant="outline"
-              disabled={query.isFetching || mutation.isPending}
-              onClick={() => void refresh()}
-            >
-              <RefreshCw aria-hidden="true" />
-              Refresh
-            </Button>
-            {canEdit && (
-              <Button
-                disabled={!canCreate || mutation.isPending}
-                onClick={() => setEditor({ row: null })}
-              >
-                <Plus aria-hidden="true" />
-                Add {singular[resource]}
-              </Button>
-            )}
-          </>
-        }
-      />
+      <PageHeader title={heading} description={description} />
       {refError ? (
         <Alert tone="warning" title="Reference data unavailable">
           {refError.message} Records retain their IDs where names cannot be
-          resolved. Refresh to retry.
+          resolved. Automatic refresh will retry.
         </Alert>
       ) : (
         !refsReady && (
@@ -430,58 +427,72 @@ export function ManagementPage({
             administrator if assistance is needed.
           </Alert>
         )}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <SearchInput
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          label={`Search loaded ${directory ? "directory" : resource}`}
-          scopeDescription="Search applies only to the currently loaded page. Pagination totals remain server totals."
-        />
-        {directory && (
-          <FormField
-            label="Role filter (loaded page)"
-            description="This filter applies only to records on the current page."
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2 [&_label]:block">
+          <SearchInput
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            label={`Search loaded ${directory ? "directory" : resource}`}
+            scopeDescription="Search applies only to the currently loaded page. Pagination totals remain server totals."
+          />
+          {directory && (
+            <FormField
+              label="Role filter (loaded page)"
+              description="This filter applies only to records on the current page."
+            >
+              {(a11y) => (
+                <Select
+                  {...a11y}
+                  value={directoryRole}
+                  onChange={(event) => setDirectoryRole(event.target.value)}
+                >
+                  <option value="all">All directory roles</option>
+                  <option value="Student">Student</option>
+                  <option value="Faculty">Faculty</option>
+                </Select>
+              )}
+            </FormField>
+          )}
+          {["grades", "inquiries", "enrollments"].includes(resource) && (
+            <FormField
+              label="Student filter"
+              description="This filter is sent to the backend across all pages."
+            >
+              {(a11y) => (
+                <Select
+                  {...a11y}
+                  value={studentId ?? ""}
+                  onChange={(event) => {
+                    setStudentId(
+                      event.target.value
+                        ? Number(event.target.value)
+                        : undefined,
+                    );
+                    setPage(1);
+                  }}
+                >
+                  <option value="">All Students</option>
+                  {users
+                    .filter((user) => user.role === "Student")
+                    .map((user) => (
+                      <option key={user.userId} value={user.userId}>
+                        {user.firstName} {user.lastName} (#{user.userId})
+                      </option>
+                    ))}
+                </Select>
+              )}
+            </FormField>
+          )}
+        </div>
+        {canEdit && (
+          <Button
+            className="w-full shrink-0 self-start sm:mt-7 sm:w-auto"
+            disabled={!canCreate || mutation.isPending}
+            onClick={() => setEditor({ row: null })}
           >
-            {(a11y) => (
-              <Select
-                {...a11y}
-                value={directoryRole}
-                onChange={(event) => setDirectoryRole(event.target.value)}
-              >
-                <option value="all">All directory roles</option>
-                <option value="Student">Student</option>
-                <option value="Faculty">Faculty</option>
-              </Select>
-            )}
-          </FormField>
-        )}
-        {["grades", "inquiries", "enrollments"].includes(resource) && (
-          <FormField
-            label="Student filter"
-            description="This filter is sent to the backend across all pages."
-          >
-            {(a11y) => (
-              <Select
-                {...a11y}
-                value={studentId ?? ""}
-                onChange={(event) => {
-                  setStudentId(
-                    event.target.value ? Number(event.target.value) : undefined,
-                  );
-                  setPage(1);
-                }}
-              >
-                <option value="">All Students</option>
-                {users
-                  .filter((user) => user.role === "Student")
-                  .map((user) => (
-                    <option key={user.userId} value={user.userId}>
-                      {user.firstName} {user.lastName} (#{user.userId})
-                    </option>
-                  ))}
-              </Select>
-            )}
-          </FormField>
+            <Plus aria-hidden="true" />
+            Add {singular[resource]}
+          </Button>
         )}
       </div>
       <DataTable<Row>
@@ -494,8 +505,9 @@ export function ManagementPage({
           header: label,
           cell: (row) => {
             const value =
-              presentRecord(resource, row, refs, policy.directoryOnly)[label] ??
-              "Unavailable";
+              presentRecord(resource, row, refs, policy.directoryOnly)[
+                label
+              ] ?? "Unavailable";
             return label === "Status" ? (
               <StatusBadge status={value} />
             ) : (
@@ -517,18 +529,18 @@ export function ManagementPage({
         error={query.error?.message}
         onRetry={() => void query.refetch()}
         emptyMessage={
-          search || (directory && directoryRole !== 'all')
+          search || (directory && directoryRole !== "all")
             ? "No matches on this loaded page. Clear the search or local role filter, or change pages."
             : "No records were returned."
         }
         actions={(row) => (
-          <div className="flex flex-wrap justify-end gap-2">
-            <Button variant="outline" size="sm" onClick={() => setView(row)}>
+          <div className="inline-flex w-max flex-nowrap items-center gap-2 [&>button]:h-9 [&>button]:whitespace-nowrap">
+            <Button variant="view" size="sm" onClick={() => setView(row)}>
               View
             </Button>
             {canEdit && (
               <Button
-                variant="secondary"
+                variant="edit"
                 size="sm"
                 disabled={
                   opening ||
@@ -560,7 +572,9 @@ export function ManagementPage({
                     () =>
                       resource === "subjects"
                         ? foundation.services.subjects.remove(recordId(row))
-                        : foundation.services.enrollments.remove(recordId(row)),
+                        : foundation.services.enrollments.remove(
+                            recordId(row),
+                          ),
                     `${singular[resource]} deleted.`,
                   )
                 }
@@ -570,6 +584,7 @@ export function ManagementPage({
               resource === "inquiries" &&
               (row as GradeInquiry).status === "Pending" && (
                 <Button
+                  variant="success"
                   size="sm"
                   disabled={mutation.isPending || !refsReady}
                   onClick={() => setEditor({ row })}
@@ -583,7 +598,12 @@ export function ManagementPage({
                 <ConfirmationDialog
                   trigger={
                     <Button
-                      variant="outline"
+                      variant={
+                        (row as SafeUser).accountStatus === "Active"
+                          ? "destructive"
+                          : "success"
+                      }
+                      className="w-26"
                       size="sm"
                       disabled={mutation.isPending}
                     >

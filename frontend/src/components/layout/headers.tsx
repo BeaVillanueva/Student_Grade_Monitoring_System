@@ -9,8 +9,8 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <header className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-      <div className="min-w-0">
+    <header className="contents">
+      <div className="sr-only">
         <h1 className="break-words">{title}</h1>
         {description && (
           <p className="mt-2 max-w-2xl break-words text-sm leading-6 text-muted-foreground">
@@ -19,7 +19,7 @@ export function PageHeader({
         )}
       </div>
       {actions && (
-        <div className="flex max-w-full flex-wrap items-center gap-2 sm:shrink-0">
+        <div className="mb-6 flex max-w-full flex-wrap items-center justify-end gap-2 empty:hidden">
           {actions}
         </div>
       )}

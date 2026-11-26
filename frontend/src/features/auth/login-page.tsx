@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { GraduationCap, LoaderCircle, ShieldCheck } from "lucide-react";
+import { GraduationCap, LoaderCircle } from "lucide-react";
 import { useAuth } from "@/auth/auth-provider";
 import { ROLE_PATHS } from "@/auth/policies";
 import type { LoginRequest } from "@/api/contracts";
@@ -41,7 +41,7 @@ export function LoginPage() {
   });
   return (
     <main className="flex min-h-svh items-center justify-center bg-background px-4 py-6 sm:px-6 sm:py-10">
-      <div className="grid w-full max-w-5xl overflow-hidden rounded-xl border bg-card shadow-panel md:min-h-[620px] md:grid-cols-[0.44fr_0.56fr]">
+      <div className="grid w-full max-w-5xl overflow-hidden rounded-xl border bg-card shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.08)] md:min-h-[620px] md:grid-cols-[0.44fr_0.56fr]">
         <section
           aria-label="About SGMS"
           className="flex flex-col bg-primary px-6 py-6 text-white sm:px-10 md:py-10"
@@ -51,7 +51,9 @@ export function LoginPage() {
               <GraduationCap className="size-7" aria-hidden="true" />
             </span>
             <div>
-              <p className="text-xl font-bold tracking-tight">SGMS</p>
+              <p className="text-xl font-bold tracking-tight">
+                Student Grade Monitoring System
+              </p>
               <p className="text-[10px] font-medium uppercase tracking-wide text-slate-200">
                 Academic management
               </p>
@@ -67,14 +69,7 @@ export function LoginPage() {
               Manage academic records, monitor student grades, and stay
               connected through one secure platform.
             </p>
-            <p className="mt-8 flex items-center gap-2 text-sm text-slate-100">
-              <ShieldCheck className="size-4" aria-hidden="true" />
-              Secure academic access
-            </p>
           </div>
-          <p className="mt-3 text-xs text-slate-200 md:mt-0">
-            Student Grade Monitoring System
-          </p>
         </section>
         <section
           className="flex min-w-0 flex-col justify-center px-6 py-9 sm:px-10 md:px-12 md:py-12"

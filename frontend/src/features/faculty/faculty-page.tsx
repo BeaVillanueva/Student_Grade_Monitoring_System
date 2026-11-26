@@ -1,13 +1,7 @@
 import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router";
-import {
-  BookOpen,
-  Users,
-  GraduationCap,
-  MessageSquare,
-  RefreshCw,
-} from "lucide-react";
+import { BookOpen, Users, GraduationCap, MessageSquare } from "lucide-react";
 import type { NavigationKey } from "@/app/navigation";
 import type {
   Grade,
@@ -24,6 +18,12 @@ import { Card, Alert } from "@/components/ui/display";
 import { Select } from "@/components/ui/form-controls";
 import { Dialog, DialogContent } from "@/components/ui/overlays";
 import { useToast } from "@/components/ui/toast";
+import {
+  DistributionChart,
+  DashboardActions,
+  DashboardAction,
+  dashboardCardClass,
+} from "@/components/shared/dashboard-visuals";
 import { SummaryCard } from "@/components/shared/summary-card";
 import { DataTable } from "@/components/shared/data-table";
 import { Pagination } from "@/components/shared/pagination";
@@ -45,6 +45,7 @@ import {
 } from "../shared/record-presentation";
 import { resolveInquirySchema } from "@/lib/validation";
 import { useFacultyRecords } from "./faculty-queries";
+import { useDashboardRefresh } from "../shared/use-dashboard-refresh";
 import {
   facultyMetrics,
   gradeForm,
@@ -80,15 +81,28 @@ function FacultyWorkspace({ page }: { page: Page }) {
   const work = useRef<(() => Promise<unknown>) | null>(null);
   const mutation = useMutation({
     ...foundation.mutation("grades", async () => {
-      if (!work.current) throw new ApiError("cancelled", "Request cancelled.");
+      if (!work.current)
+        throw new ApiError("cancelled", "Request cancelled.");
       return work.current();
     }),
     gcTime: 0,
   });
+  useDashboardRefresh(
+    refresh,
+    true,
+    query.isFetching ||
+      mutation.isPending ||
+      namesPending ||
+      Boolean(editor) ||
+      Boolean(resolution) ||
+      Boolean(detail),
+  );
   const data = query.data;
   const refs: ReferenceMaps = {
     users: new Map(students),
-    subjects: new Map(data?.subjects.map((row) => [row.subjectId, row]) ?? []),
+    subjects: new Map(
+      data?.subjects.map((row) => [row.subjectId, row]) ?? [],
+    ),
     enrollments: new Map(
       data?.enrollments.map((row) => [row.enrollmentId, row]) ?? [],
     ),
@@ -113,7 +127,10 @@ function FacultyWorkspace({ page }: { page: Page }) {
       operation === "create"
         ? foundation.services.grades.create(input as CreateGradeRequest)
         : operation === "update"
-          ? foundation.services.grades.update(id!, input as UpdateGradeRequest)
+          ? foundation.services.grades.update(
+              id!,
+              input as UpdateGradeRequest,
+            )
           : foundation.services.inquiries.resolve(
               id!,
               input as { resolutionNote: string },
@@ -241,7 +258,7 @@ function FacultyWorkspace({ page }: { page: Page }) {
         </p>
         <Button
           size="sm"
-          variant="outline"
+          variant="edit"
           disabled={mutation.isPending}
           onClick={() => setEditor({ grade })}
         >
@@ -265,17 +282,11 @@ function FacultyWorkspace({ page }: { page: Page }) {
         }
         actions={
           <>
-            <Button
-              variant="outline"
-              disabled={query.isFetching || mutation.isPending}
-              onClick={() => void refresh()}
-            >
-              <RefreshCw aria-hidden="true" />
-              Refresh
-            </Button>
             {page === "grades" && (
               <Button
-                disabled={!data || eligible.length === 0 || mutation.isPending}
+                disabled={
+                  !data || eligible.length === 0 || mutation.isPending
+                }
                 onClick={openCreate}
               >
                 Encode Grade
@@ -295,14 +306,14 @@ function FacultyWorkspace({ page }: { page: Page }) {
         <>
           {namesPending && (
             <p role="status" className="text-xs text-muted-foreground">
-              Loading permitted Student names within the shared request budget.
-              IDs remain available.
+              Loading permitted Student names within the shared request
+              budget. IDs remain available.
             </p>
           )}
           {namesFailed && (
             <Alert title="Some Student names are unavailable" tone="warning">
-              Permitted identifiers remain visible. Refresh to retry; no
-              unrelated profiles are requested.
+              Permitted identifiers remain visible. Automatic refresh will
+              retry; no unrelated profiles are requested.
             </Alert>
           )}
           {page === "dashboard" && metrics ? (
@@ -313,7 +324,7 @@ function FacultyWorkspace({ page }: { page: Page }) {
                   ["Total Assigned Students", metrics.students, Users],
                   ["Total Recorded Grades", metrics.grades, GraduationCap],
                   ["Pending Grade Inquiries", metrics.pending, MessageSquare],
-                ].map(([label, count, Icon]) => {
+                ].map(([label, count, Icon], index) => {
                   const MetricIcon = Icon as typeof Users;
                   return (
                     <SummaryCard
@@ -321,22 +332,28 @@ function FacultyWorkspace({ page }: { page: Page }) {
                       label={String(label)}
                       value={Number(count).toLocaleString()}
                       icon={<MetricIcon />}
+                      tone={
+                        (["blue", "violet", "teal", "rose"] as const)[index]
+                      }
                     />
                   );
                 })}
               </div>
               <p className="text-xs text-muted-foreground">
-                {metrics.students} unique Students across {metrics.enrollments}{" "}
-                enrollment records. All totals use complete assigned datasets.
+                {metrics.students} unique Students across{" "}
+                {metrics.enrollments} enrollment records. All totals use
+                complete assigned datasets.
               </p>
               <div className="grid gap-5 xl:grid-cols-2">
-                <Card>
+                <Card className={dashboardCardClass}>
                   <h2 className="mb-4 text-base">My assigned subjects</h2>
                   {data.subjects.length ? (
                     <ul className="divide-y">
                       {data.subjects.map((row) => (
                         <li key={row.subjectId} className="py-3 text-sm">
-                          <span className="font-medium">{row.subjectCode}</span>{" "}
+                          <span className="font-medium">
+                            {row.subjectCode}
+                          </span>{" "}
                           · {row.subjectName}
                           <span className="block text-xs text-muted-foreground">
                             {row.units} units ·{" "}
@@ -358,50 +375,40 @@ function FacultyWorkspace({ page }: { page: Page }) {
                     />
                   )}
                 </Card>
-                <Card>
-                  <h2 className="mb-4 text-base">Quick actions</h2>
-                  <div className="grid gap-3">
-                    {[
-                      ["Encode Grades", "/faculty/grades?action=create"],
-                      ["View My Students", "/faculty/students"],
-                      ["Review Grade Inquiries", "/faculty/grade-inquiries"],
-                    ].map(([label, to]) => (
-                      <Link
-                        key={to}
-                        to={to}
-                        className="rounded-md border px-4 py-3 text-sm font-medium text-primary hover:bg-secondary"
-                      >
-                        {label}
-                      </Link>
-                    ))}
-                  </div>
-                </Card>
-                <Card>
-                  <h2 className="mb-4 text-base">Grade type overview</h2>
-                  <dl className="space-y-3">
-                    {Object.entries(metrics.gradeTypes).map(([type, count]) => (
-                      <div className="flex justify-between" key={type}>
-                        <dt>{type}</dt>
-                        <dd>{count}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </Card>
-                <Card>
-                  <h2 className="mb-4 text-base">Inquiry status overview</h2>
-                  <dl className="space-y-3">
-                    {Object.entries(metrics.inquiryStates).map(
-                      ([status, count]) => (
-                        <div className="flex justify-between" key={status}>
-                          <dt>
-                            <StatusBadge status={status} />
-                          </dt>
-                          <dd>{count}</dd>
-                        </div>
-                      ),
-                    )}
-                  </dl>
-                </Card>
+                <DashboardActions>
+                  {[
+                    ["Encode Grades", "/faculty/grades?action=create"],
+                    ["View My Students", "/faculty/students"],
+                    ["Review Grade Inquiries", "/faculty/grade-inquiries"],
+                  ].map(([label, to]) => (
+                    <DashboardAction
+                      key={to}
+                      to={to}
+                      icon={
+                        label.includes("Students") ? (
+                          <Users />
+                        ) : label.includes("Inquiries") ? (
+                          <MessageSquare />
+                        ) : (
+                          <GraduationCap />
+                        )
+                      }
+                    >
+                      {label}
+                    </DashboardAction>
+                  ))}
+                </DashboardActions>
+                <DistributionChart
+                  title="Grade type overview"
+                  values={metrics.gradeTypes}
+                  variant="bars"
+                  description="Recorded grades in your assigned subjects."
+                />
+                <DistributionChart
+                  title="Inquiry status"
+                  values={metrics.inquiryStates}
+                  description="Inquiries linked to your assigned academic records."
+                />
               </div>
             </>
           ) : (
@@ -494,7 +501,11 @@ function FacultyWorkspace({ page }: { page: Page }) {
                       header: "Subject Name",
                       cell: (row) => row.subjectName,
                     },
-                    { key: "units", header: "Units", cell: (row) => row.units },
+                    {
+                      key: "units",
+                      header: "Units",
+                      cell: (row) => row.units,
+                    },
                     {
                       key: "enrollments",
                       header: "Enrollments",
@@ -509,7 +520,7 @@ function FacultyWorkspace({ page }: { page: Page }) {
                   actions={(row) => (
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="view"
                       onClick={() => showDetail("subjects", row)}
                     >
                       View
@@ -544,13 +555,14 @@ function FacultyWorkspace({ page }: { page: Page }) {
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant="view"
                         onClick={() => showDetail("inquiries", row)}
                       >
                         View
                       </Button>
                       {row.status === "Pending" && (
                         <Button
+                          variant="success"
                           size="sm"
                           disabled={mutation.isPending}
                           onClick={() => setResolution(row)}
@@ -614,9 +626,9 @@ function FacultyWorkspace({ page }: { page: Page }) {
                           {
                             key: "status",
                             header: "Status",
-                            cell: (row: (typeof data.enrollments)[number]) => (
-                              <StatusBadge status={row.status} />
-                            ),
+                            cell: (
+                              row: (typeof data.enrollments)[number],
+                            ) => <StatusBadge status={row.status} />,
                           },
                           {
                             key: "date",
@@ -631,7 +643,7 @@ function FacultyWorkspace({ page }: { page: Page }) {
                   actions={(row) => (
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="view"
                       onClick={() => showDetail("enrollments", row)}
                     >
                       View enrollment
@@ -717,7 +729,8 @@ function FacultyWorkspace({ page }: { page: Page }) {
                   {data?.subjects
                     .filter((row) =>
                       eligible.some(
-                        (enrollment) => enrollment.subjectId === row.subjectId,
+                        (enrollment) =>
+                          enrollment.subjectId === row.subjectId,
                       ),
                     )
                     .map((row) => (
@@ -775,7 +788,9 @@ function FacultyWorkspace({ page }: { page: Page }) {
               defaults={{ resolutionNote: "" }}
               schema={resolveInquirySchema}
               confirmation="Resolve this inquiry? This cannot reopen the inquiry or change its grade."
-              onSave={(values) => save("resolve", resolution.inquiryId, values)}
+              onSave={(values) =>
+                save("resolve", resolution.inquiryId, values)
+              }
             />
           )}
         </DialogContent>

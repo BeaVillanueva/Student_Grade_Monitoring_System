@@ -1,12 +1,7 @@
 import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router";
-import {
-  BookOpen,
-  GraduationCap,
-  MessageSquare,
-  RefreshCw,
-} from "lucide-react";
+import { BookOpen, GraduationCap, MessageSquare } from "lucide-react";
 import type { NavigationKey } from "@/app/navigation";
 import type { Grade, GradeInquiry, Enrollment } from "@/api/contracts";
 import { useAuth } from "@/auth/auth-provider";
@@ -24,6 +19,13 @@ import { Pagination } from "@/components/shared/pagination";
 import { SearchInput } from "@/components/shared/filters";
 import { FormField } from "@/components/shared/form-field";
 import { StatusBadge } from "@/components/shared/status-badge";
+import {
+  DistributionChart,
+  GradeComparisonChart,
+  DashboardActions,
+  DashboardAction,
+} from "@/components/shared/dashboard-visuals";
+import { gradeComparisonRows } from "../shared/dashboard-chart-data";
 import { SummaryCard } from "@/components/shared/summary-card";
 import { LoadingState, ErrorState } from "@/components/feedback/states";
 import { EntityForm } from "../shared/entity-form";
@@ -34,6 +36,7 @@ import {
   type ReferenceMaps,
 } from "../shared/record-presentation";
 import { useStudentRecords } from "./student-queries";
+import { useDashboardRefresh } from "../shared/use-dashboard-refresh";
 import { studentMetrics, ownInquiry } from "./student-data";
 type Page = "dashboard" | "subjects" | "grades" | "inquiries";
 const titles: Record<Page, string> = {
@@ -65,16 +68,24 @@ function StudentWorkspace({ page }: { page: Page }) {
   const work = useRef<(() => Promise<unknown>) | null>(null);
   const mutation = useMutation({
     ...foundation.mutation("inquiries", async () => {
-      if (!work.current) throw new ApiError("cancelled", "Request cancelled.");
+      if (!work.current)
+        throw new ApiError("cancelled", "Request cancelled.");
       return work.current();
     }),
     gcTime: 0,
   });
+  useDashboardRefresh(
+    refresh,
+    true,
+    query.isFetching || mutation.isPending || formOpen || Boolean(detail),
+  );
   const data = query.data,
     metrics = data ? studentMetrics(data) : null;
   const refs: ReferenceMaps = {
     users: new Map(auth.user ? [[auth.user.userId, auth.user]] : []),
-    subjects: new Map(data?.subjects.map((row) => [row.subjectId, row]) ?? []),
+    subjects: new Map(
+      data?.subjects.map((row) => [row.subjectId, row]) ?? [],
+    ),
     enrollments: new Map(
       data?.enrollments.map((row) => [row.enrollmentId, row]) ?? [],
     ),
@@ -149,8 +160,12 @@ function StudentWorkspace({ page }: { page: Page }) {
       (!status || row.status === status) &&
       filter(Object.values(presentRecord("inquiries", row, refs)).join(" ")),
   );
-  const total = page === "inquiries" ? inquiryRows.length : academicRows.length,
-    safePage = Math.min(currentPage, Math.max(1, Math.ceil(total / pageSize))),
+  const total =
+      page === "inquiries" ? inquiryRows.length : academicRows.length,
+    safePage = Math.min(
+      currentPage,
+      Math.max(1, Math.ceil(total / pageSize)),
+    ),
     start = (safePage - 1) * pageSize;
   const reset = () => setCurrentPage(1);
   const gradeDetails = (grade: Grade) => {
@@ -179,12 +194,16 @@ function StudentWorkspace({ page }: { page: Page }) {
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
-            variant="outline"
+            variant="view"
             onClick={() => gradeDetails(grade)}
           >
             View {type}
           </Button>
-          <Button size="sm" variant="secondary" onClick={() => openForm(grade)}>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => openForm(grade)}
+          >
             Inquire {type}
           </Button>
         </div>
@@ -229,14 +248,6 @@ function StudentWorkspace({ page }: { page: Page }) {
         description="Stay updated on your own academic records and grade inquiries."
         actions={
           <>
-            <Button
-              variant="outline"
-              disabled={query.isFetching || mutation.isPending}
-              onClick={() => void refresh()}
-            >
-              <RefreshCw aria-hidden="true" />
-              Refresh
-            </Button>
             {page === "inquiries" && (
               <Button
                 disabled={!data?.grades.length || mutation.isPending}
@@ -264,7 +275,7 @@ function StudentWorkspace({ page }: { page: Page }) {
                   ["My Subjects", metrics.subjects, BookOpen],
                   ["Recorded Grades", metrics.grades, GraduationCap],
                   ["Pending Grade Inquiries", metrics.pending, MessageSquare],
-                ].map(([label, count, Icon]) => {
+                ].map(([label, count, Icon], index) => {
                   const MetricIcon = Icon as typeof BookOpen;
                   return (
                     <SummaryCard
@@ -272,51 +283,59 @@ function StudentWorkspace({ page }: { page: Page }) {
                       label={String(label)}
                       value={Number(count).toLocaleString()}
                       icon={<MetricIcon />}
+                      tone={(["blue", "teal", "rose"] as const)[index]}
                     />
                   );
                 })}
               </div>
               <p className="text-xs text-muted-foreground">
-                {metrics.subjects} unique subjects across {metrics.enrollments}{" "}
-                enrollment records. Counts use complete personal datasets.
+                {metrics.subjects} unique subjects across{" "}
+                {metrics.enrollments} enrollment records. Counts use complete
+                personal datasets.
               </p>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Card>
-                  <h2 className="mb-3 text-base">Grade record overview</h2>
-                  <p className="text-sm">
-                    Midterm: {metrics.midterm} · Final: {metrics.final}
-                  </p>
-                </Card>
-                <Card>
-                  <h2 className="mb-3 text-base">Inquiry status overview</h2>
-                  <p className="text-sm">
-                    Pending: {metrics.pending} · Resolved: {metrics.resolved}
-                  </p>
-                </Card>
-              </div>
-              <Card>
-                <h2 className="mb-4 text-base">Quick actions</h2>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <Link
-                    className="rounded-md border p-3 text-sm text-primary"
-                    to="/student/grades"
-                  >
-                    View My Grades
-                  </Link>
-                  <Link
-                    className="rounded-md border p-3 text-sm text-primary"
-                    to="/student/grade-inquiries?action=create"
-                  >
-                    Submit Grade Inquiry
-                  </Link>
-                  <Link
-                    className="rounded-md border p-3 text-sm text-primary"
-                    to="/student/subjects"
-                  >
-                    View My Subjects
-                  </Link>
+              <div className="grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+                <GradeComparisonChart
+                  rows={gradeComparisonRows(
+                    data.enrollments,
+                    data.grades,
+                    data.subjects,
+                  )}
+                />
+                <div className="grid min-w-0 gap-5">
+                  <DistributionChart
+                    title="Grade record overview"
+                    values={{
+                      Midterm: metrics.midterm,
+                      Final: metrics.final,
+                    }}
+                    variant="bars"
+                  />
+                  <DistributionChart
+                    title="My inquiry status"
+                    values={{
+                      Pending: metrics.pending,
+                      Resolved: metrics.resolved,
+                    }}
+                  />
                 </div>
-              </Card>
+              </div>
+              <DashboardActions>
+                <DashboardAction
+                  to="/student/grades"
+                  icon={<GraduationCap />}
+                >
+                  View My Grades
+                </DashboardAction>
+                <DashboardAction
+                  to="/student/grade-inquiries?action=create"
+                  icon={<MessageSquare />}
+                >
+                  Submit Grade Inquiry
+                </DashboardAction>
+                <DashboardAction to="/student/subjects" icon={<BookOpen />}>
+                  View My Subjects
+                </DashboardAction>
+              </DashboardActions>
             </>
           )}
           {page === "inquiries" &&
@@ -391,7 +410,11 @@ function StudentWorkspace({ page }: { page: Page }) {
                       "Semester",
                       semester,
                       setSemester,
-                      [...new Set(data.enrollments.map((row) => row.semester))],
+                      [
+                        ...new Set(
+                          data.enrollments.map((row) => row.semester),
+                        ),
+                      ],
                     ],
                   ].map(([label, value, setter, options]) => (
                     <FormField
@@ -495,7 +518,7 @@ function StudentWorkspace({ page }: { page: Page }) {
               actions={(row) => (
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="view"
                   onClick={() =>
                     setDetail({
                       "Inquiry ID": String(row.inquiryId),
@@ -522,7 +545,9 @@ function StudentWorkspace({ page }: { page: Page }) {
                   key: "faculty",
                   header: "Faculty",
                   cell: (row) => {
-                    const faculty = refs.subjects.get(row.subjectId)?.facultyId;
+                    const faculty = refs.subjects.get(
+                      row.subjectId,
+                    )?.facultyId;
                     return faculty ? `Faculty #${faculty}` : "Unavailable";
                   },
                 },
@@ -542,7 +567,7 @@ function StudentWorkspace({ page }: { page: Page }) {
               actions={(row) => (
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="view"
                   onClick={() =>
                     setDetail({
                       "Enrollment ID": String(row.enrollmentId),
@@ -654,8 +679,8 @@ function StudentWorkspace({ page }: { page: Page }) {
                   .filter((subject) =>
                     data.grades.some(
                       (grade) =>
-                        refs.enrollments.get(grade.enrollmentId)?.subjectId ===
-                        subject.subjectId,
+                        refs.enrollments.get(grade.enrollmentId)
+                          ?.subjectId === subject.subjectId,
                     ),
                   )
                   .map((subject) => (
@@ -684,7 +709,9 @@ function StudentWorkspace({ page }: { page: Page }) {
                   type: "select",
                   required: true,
                   options: formGrades.map((grade) => {
-                    const enrollment = refs.enrollments.get(grade.enrollmentId);
+                    const enrollment = refs.enrollments.get(
+                      grade.enrollmentId,
+                    );
                     return {
                       value: grade.gradeId,
                       label: `${grade.gradeType} · ${grade.score} · Grade #${grade.gradeId} · Enrollment #${grade.enrollmentId} · ${enrollment?.semester} · ${enrollment?.schoolYear}`,
