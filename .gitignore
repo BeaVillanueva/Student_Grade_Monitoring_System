@@ -20,3 +20,6 @@ coverage/
 Thumbs.db
 .idea/
 .vscode/
+
+# Private Postman exports, run manifests, schema cache, and unredacted evidence
+/postman/.local/
