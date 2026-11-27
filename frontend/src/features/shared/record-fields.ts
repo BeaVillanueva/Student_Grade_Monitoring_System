@@ -64,7 +64,7 @@ export function recordForm(
         {
           path: ["facultyId"],
           message: policy.directoryOnly
-            ? "Choose a Faculty directory entry."
+            ? "Choose a faculty member."
             : "Choose an Active Faculty account.",
         },
       ),
@@ -79,7 +79,7 @@ export function recordForm(
           required: true,
           options: userOptions("Faculty"),
           description: policy.directoryOnly
-            ? "The directory does not expose account status. The backend validates whether this assignment is allowed."
+            ? "Choose an eligible faculty member."
             : "Only Active Faculty accounts can be assigned.",
         },
       ] as FieldDefinition[],
@@ -120,7 +120,7 @@ export function recordForm(
           {
             path: ["studentId"],
             message: policy.directoryOnly
-              ? "Choose a Student directory entry."
+              ? "Choose a student."
               : "Choose an Active Student account.",
           },
         )
@@ -137,7 +137,7 @@ export function recordForm(
           required: true,
           options: students,
           description: policy.directoryOnly
-            ? "Account status is not available here. The backend validates new assignments; an unchanged historical assignment may be retained."
+            ? "New assignments require an active student. Existing assignments may be kept."
             : "New assignments require an Active Student. An unchanged historical assignment may be retained.",
         },
         {

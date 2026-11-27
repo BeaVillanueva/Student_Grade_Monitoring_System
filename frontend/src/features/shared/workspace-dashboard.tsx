@@ -99,7 +99,7 @@ export function WorkspaceDashboard({
           onRetry={() => void refresh()}
         />
       ) : !data ? (
-        <LoadingState label="Loading complete statistics. Large datasets may wait for the shared request budget…" />
+        <LoadingState label="Loading dashboard…" />
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -136,9 +136,8 @@ export function WorkspaceDashboard({
           </div>
           <p className="text-xs text-muted-foreground">
             {policy.directoryOnly
-              ? "Student and Faculty totals count permitted directory entries. Account status is not exposed, so these are not active-account counts."
-              : "Student and Faculty counts include Active and Inactive accounts."}{" "}
-            Status distributions use complete datasets, not a single page.
+              ? "Student and faculty totals include all listed accounts."
+              : "Student and faculty totals include active and inactive accounts."}
           </p>
           <div
             className={

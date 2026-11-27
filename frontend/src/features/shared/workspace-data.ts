@@ -47,7 +47,7 @@ export async function collectComplete<T>(
       if (pages > maxPages)
         throw new ApiError(
           "response",
-          "The dataset exceeds the safe loading limit. Complete statistics or selection data are unavailable.",
+          "There are too many records to display. Please contact your administrator.",
         );
     }
     if (
@@ -57,14 +57,14 @@ export async function collectComplete<T>(
     )
       throw new ApiError(
         "response",
-        "Records changed while loading. Refresh to load a consistent dataset.",
+        "Records changed while loading. Please try again.",
       );
     for (const row of result.data) {
       const id = identify(row);
       if (seen.has(id))
         throw new ApiError(
           "response",
-          "Records changed while loading. Refresh to load a consistent dataset.",
+          "Records changed while loading. Please try again.",
         );
       seen.add(id);
       rows.push(row);
@@ -73,7 +73,7 @@ export async function collectComplete<T>(
   if (rows.length !== total)
     throw new ApiError(
       "response",
-      "The complete dataset could not be loaded. Please refresh.",
+      "Some records could not be loaded. Please try again.",
     );
   return { rows, total, complete: true };
 }

@@ -246,18 +246,6 @@ function StudentWorkspace({ page }: { page: Page }) {
       <PageHeader
         title={titles[page]}
         description="Stay updated on your own academic records and grade inquiries."
-        actions={
-          <>
-            {page === "inquiries" && (
-              <Button
-                disabled={!data?.grades.length || mutation.isPending}
-                onClick={() => openForm()}
-              >
-                Submit Grade Inquiry
-              </Button>
-            )}
-          </>
-        }
       />
       {query.error ? (
         <ErrorState
@@ -265,7 +253,7 @@ function StudentWorkspace({ page }: { page: Page }) {
           onRetry={() => void refresh()}
         />
       ) : !data ? (
-        <LoadingState label="Loading complete personal academic records within the shared request budget…" />
+        <LoadingState label="Loading your academic records…" />
       ) : (
         <>
           {page === "dashboard" && metrics && (
@@ -289,9 +277,7 @@ function StudentWorkspace({ page }: { page: Page }) {
                 })}
               </div>
               <p className="text-xs text-muted-foreground">
-                {metrics.subjects} unique subjects across{" "}
-                {metrics.enrollments} enrollment records. Counts use complete
-                personal datasets.
+                {metrics.subjects} subjects across {metrics.enrollments} enrollments.
               </p>
               <div className="grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
                 <GradeComparisonChart
@@ -363,130 +349,144 @@ function StudentWorkspace({ page }: { page: Page }) {
               </Alert>
             )}
           {page !== "dashboard" && (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              <SearchInput
-                value={search}
-                label={`Search my ${page}`}
-                onChange={(event) => {
-                  setSearch(event.target.value);
-                  reset();
-                }}
-                scopeDescription="Client-side search across your complete permitted dataset."
-              />
-              {page === "inquiries" ? (
-                <FormField
-                  label="Inquiry status"
-                  description="Client-side filter over all your loaded inquiries."
-                >
-                  {(a11y) => (
-                    <Select
-                      {...a11y}
-                      value={status}
-                      onChange={(event) => {
-                        setStatus(event.target.value);
-                        reset();
-                      }}
-                    >
-                      <option value="">All statuses</option>
-                      <option>Pending</option>
-                      <option>Resolved</option>
-                    </Select>
-                  )}
-                </FormField>
-              ) : (
-                <>
-                  {[
-                    [
-                      "School year",
-                      schoolYear,
-                      setSchoolYear,
-                      [
-                        ...new Set(
-                          data.enrollments.map((row) => row.schoolYear),
-                        ),
-                      ],
-                    ],
-                    [
-                      "Semester",
-                      semester,
-                      setSemester,
-                      [
-                        ...new Set(
-                          data.enrollments.map((row) => row.semester),
-                        ),
-                      ],
-                    ],
-                  ].map(([label, value, setter, options]) => (
-                    <FormField
-                      key={String(label)}
-                      label={String(label)}
-                      description="Client-side filter over your complete enrollment dataset."
-                    >
-                      {(a11y) => (
-                        <Select
-                          {...a11y}
-                          value={value as string}
-                          onChange={(event) => {
-                            (setter as (value: string) => void)(
-                              event.target.value,
-                            );
-                            reset();
-                          }}
-                        >
-                          <option value="">
-                            All {String(label).toLowerCase()} values
-                          </option>
-                          {(options as string[]).map((option) => (
-                            <option key={option}>{option}</option>
-                          ))}
-                        </Select>
-                      )}
-                    </FormField>
-                  ))}
+            <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-start">
+              <div
+                className={`grid min-w-0 flex-1 gap-4 sm:grid-cols-2 [&_label]:block ${
+                  page === "inquiries"
+                    ? ""
+                    : page === "grades"
+                      ? "xl:grid-cols-5"
+                      : "xl:grid-cols-4"
+                }`}
+              >
+                <SearchInput
+                  value={search}
+                  label={`Search my ${page}`}
+                  onChange={(event) => {
+                    setSearch(event.target.value);
+                    reset();
+                  }}
+                />
+                {page === "inquiries" ? (
                   <FormField
-                    label="Subject"
-                    description="Only subjects from your own enrollments."
+                    label="Inquiry status"
                   >
                     {(a11y) => (
                       <Select
                         {...a11y}
-                        value={subjectId}
+                        value={status}
                         onChange={(event) => {
-                          setSubjectId(event.target.value);
+                          setStatus(event.target.value);
                           reset();
                         }}
                       >
-                        <option value="">All my subjects</option>
-                        {data.subjects.map((row) => (
-                          <option key={row.subjectId} value={row.subjectId}>
-                            {row.subjectCode} · {row.subjectName}
-                          </option>
-                        ))}
+                        <option value="">All statuses</option>
+                        <option>Pending</option>
+                        <option>Resolved</option>
                       </Select>
                     )}
                   </FormField>
-                  {page === "grades" && (
+                ) : (
+                  <>
+                    {[
+                      [
+                        "School year",
+                        schoolYear,
+                        setSchoolYear,
+                        [
+                          ...new Set(
+                            data.enrollments.map((row) => row.schoolYear),
+                          ),
+                        ],
+                      ],
+                      [
+                        "Semester",
+                        semester,
+                        setSemester,
+                        [
+                          ...new Set(
+                            data.enrollments.map((row) => row.semester),
+                          ),
+                        ],
+                      ],
+                    ].map(([label, value, setter, options]) => (
+                      <FormField
+                        key={String(label)}
+                        label={String(label)}
+                      >
+                        {(a11y) => (
+                          <Select
+                            {...a11y}
+                            value={value as string}
+                            onChange={(event) => {
+                              (setter as (value: string) => void)(
+                                event.target.value,
+                              );
+                              reset();
+                            }}
+                          >
+                            <option value="">
+                              All {String(label).toLowerCase()} values
+                            </option>
+                            {(options as string[]).map((option) => (
+                              <option key={option}>{option}</option>
+                            ))}
+                          </Select>
+                        )}
+                      </FormField>
+                    ))}
                     <FormField
-                      label="Grade type"
-                      description="Client-side filter; rows stay grouped by enrollment ID."
+                      label="Subject"
                     >
                       {(a11y) => (
                         <Select
                           {...a11y}
-                          value={gradeType}
+                          value={subjectId}
                           onChange={(event) => {
-                            setGradeType(event.target.value);
+                            setSubjectId(event.target.value);
                             reset();
                           }}
                         >
-                          <option value="">All grade types</option>
-                          <option>Midterm</option>
-                          <option>Final</option>
+                          <option value="">All my subjects</option>
+                          {data.subjects.map((row) => (
+                            <option key={row.subjectId} value={row.subjectId}>
+                              {row.subjectCode} · {row.subjectName}
+                            </option>
+                          ))}
                         </Select>
                       )}
                     </FormField>
-                  )}
-                </>
+                    {page === "grades" && (
+                      <FormField
+                        label="Grade type"
+                      >
+                        {(a11y) => (
+                          <Select
+                            {...a11y}
+                            value={gradeType}
+                            onChange={(event) => {
+                              setGradeType(event.target.value);
+                              reset();
+                            }}
+                          >
+                            <option value="">All grade types</option>
+                            <option>Midterm</option>
+                            <option>Final</option>
+                          </Select>
+                        )}
+                      </FormField>
+                    )}
+                  </>
+                )}
+              </div>
+              {page === "inquiries" && (
+                <Button
+                  className="w-full shrink-0 self-start lg:mt-7 lg:w-auto"
+                  disabled={!data.grades.length || mutation.isPending}
+                  onClick={() => openForm()}
+                >
+                  Submit Grade Inquiry
+                </Button>
               )}
             </div>
           )}
@@ -606,9 +606,7 @@ function StudentWorkspace({ page }: { page: Page }) {
             />
           )}
           <p className="text-xs text-muted-foreground">
-            Client-side pagination over complete personal records. Separate
-            academic terms retain separate enrollment rows. Missing grades are
-            not zero.
+            Missing grades are shown as “Not recorded”.
           </p>
           <Pagination
             page={safePage}

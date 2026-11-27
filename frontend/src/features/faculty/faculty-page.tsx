@@ -301,19 +301,17 @@ function FacultyWorkspace({ page }: { page: Page }) {
           onRetry={() => void refresh()}
         />
       ) : !data ? (
-        <LoadingState label="Loading complete assigned records within the shared request budget…" />
+        <LoadingState label="Loading your assigned records…" />
       ) : (
         <>
           {namesPending && (
             <p role="status" className="text-xs text-muted-foreground">
-              Loading permitted Student names within the shared request
-              budget. IDs remain available.
+              Loading student names...
             </p>
           )}
           {namesFailed && (
             <Alert title="Some Student names are unavailable" tone="warning">
-              Permitted identifiers remain visible. Automatic refresh will
-              retry; no unrelated profiles are requested.
+              Student names will be retried automatically.
             </Alert>
           )}
           {page === "dashboard" && metrics ? (
@@ -340,9 +338,7 @@ function FacultyWorkspace({ page }: { page: Page }) {
                 })}
               </div>
               <p className="text-xs text-muted-foreground">
-                {metrics.students} unique Students across{" "}
-                {metrics.enrollments} enrollment records. All totals use
-                complete assigned datasets.
+                {metrics.students} students across {metrics.enrollments} enrollments.
               </p>
               <div className="grid gap-5 xl:grid-cols-2">
                 <Card className={dashboardCardClass}>
@@ -439,12 +435,10 @@ function FacultyWorkspace({ page }: { page: Page }) {
                     setSearch(event.target.value);
                     reset();
                   }}
-                  scopeDescription="Client-side search across the complete assigned dataset."
                 />
                 {page !== "subjects" && (
                   <FormField
                     label="Subject"
-                    description="Client-side filter over all loaded assigned records."
                   >
                     {(a11y) => (
                       <Select
@@ -468,7 +462,6 @@ function FacultyWorkspace({ page }: { page: Page }) {
                 {page === "grades" && (
                   <FormField
                     label="Grade type"
-                    description="Client-side filter. Rows are grouped by enrollment ID."
                   >
                     {(a11y) => (
                       <Select
@@ -651,12 +644,11 @@ function FacultyWorkspace({ page }: { page: Page }) {
                   )}
                 />
               )}
-              <p className="text-xs text-muted-foreground">
-                Client-side pagination over complete assigned records.
-                {page === "students"
-                  ? " Rows represent enrollments; a Student may appear in multiple rows."
-                  : ""}
-              </p>
+              {page === "students" && (
+                <p className="text-xs text-muted-foreground">
+                  A student may appear more than once when enrolled in different subjects.
+                </p>
+              )}
               <Pagination
                 page={currentPage}
                 pageSize={pageSize}
@@ -746,7 +738,7 @@ function FacultyWorkspace({ page }: { page: Page }) {
             <EntityForm
               key={editor?.grade?.gradeId ?? encodeSubject}
               {...form}
-              confirmation="Save this grade? The backend enforces assignment, eligibility and duplicate-grade rules."
+              confirmation="Save this grade?"
               onSave={(values) =>
                 save(
                   editor?.grade ? "update" : "create",

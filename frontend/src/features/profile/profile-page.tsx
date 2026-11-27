@@ -65,10 +65,6 @@ export function ProfilePage() {
             </div>
           )}
         </dl>
-        <p className="mt-7 border-t pt-5 text-xs leading-5 text-muted-foreground">
-          This profile is read-only. Account dates use your browser’s local
-          timezone.
-        </p>
       </Card>
     </>
   );

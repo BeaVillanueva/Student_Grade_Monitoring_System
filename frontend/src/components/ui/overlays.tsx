@@ -6,9 +6,9 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
-const overlayClass = "fixed inset-0 z-40 bg-slate-950/45";
+const overlayClass = "fixed inset-0 z-40 bg-slate-950/60";
 const panelClass =
-  "fixed left-1/2 top-1/2 z-50 max-h-[90svh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto overscroll-contain rounded-lg border bg-card p-4 shadow-lg [overflow-wrap:anywhere] sm:max-h-[85svh] sm:p-6";
+  "fixed left-1/2 top-1/2 z-50 max-h-[90svh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto overscroll-contain rounded-lg border bg-card p-4 shadow-[0_24px_64px_rgba(15,23,42,0.28),0_8px_24px_rgba(15,23,42,0.18)] [overflow-wrap:anywhere] sm:max-h-[85svh] sm:p-6";
 export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogClose = DialogPrimitive.Close;
@@ -86,8 +86,8 @@ export function AlertDialogContent({
 }) {
   return (
     <AlertPrimitive.Portal>
-      <AlertPrimitive.Overlay className={overlayClass} />
-      <AlertPrimitive.Content className={panelClass}>
+      <AlertPrimitive.Overlay className={cn(overlayClass, "z-60")} />
+      <AlertPrimitive.Content className={cn(panelClass, "z-70")}>
         <AlertPrimitive.Title className="text-lg font-semibold">
           {title}
         </AlertPrimitive.Title>

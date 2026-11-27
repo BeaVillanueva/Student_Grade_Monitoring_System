@@ -8,7 +8,7 @@ export function SearchInput({
   ...props
 }: Omit<ComponentProps<"input">, "type"> & {
   label?: string;
-  scopeDescription: string;
+  scopeDescription?: string;
 }) {
   const generatedId = useId();
   const id = providedId ?? generatedId;
@@ -25,12 +25,14 @@ export function SearchInput({
           id={id}
           type="search"
           className="pl-10"
-          aria-describedby={`${id}-scope`}
+          aria-describedby={scopeDescription ? `${id}-scope` : undefined}
         />
       </div>
-      <p id={`${id}-scope`} className="text-xs leading-5 text-muted-foreground">
-        {scopeDescription}
-      </p>
+      {scopeDescription && (
+        <p id={`${id}-scope`} className="text-xs leading-5 text-muted-foreground">
+          {scopeDescription}
+        </p>
+      )}
     </div>
   );
 }

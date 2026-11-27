@@ -159,8 +159,8 @@ export function DistributionChart({
           </div>
           <p className="mt-5 text-xs leading-5 text-muted-foreground">
             {data.total === 0
-              ? "No records yet. Percentages are unavailable for an empty dataset."
-              : "Share of recorded entries. Percentages rounded to one decimal place."}
+              ? "No records yet."
+              : "Percentages are rounded to one decimal place."}
           </p>
         </>
       )}

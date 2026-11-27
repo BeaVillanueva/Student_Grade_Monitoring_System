@@ -121,7 +121,7 @@ export function gradeForm(
               label: `Student #${row.studentId} · Enrollment #${row.enrollmentId} · ${row.semester} · ${row.schoolYear}`,
             })),
             description:
-              "Enrolled records only. The backend also checks assignment, account eligibility and duplicate grade types.",
+              "Choose an enrolled student.",
           },
         ]
       : []),

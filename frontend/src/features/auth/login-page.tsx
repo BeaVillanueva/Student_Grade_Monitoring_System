@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input, PasswordInput } from "@/components/ui/form-controls";
 import { Alert } from "@/components/ui/display";
 import { FormField } from "@/components/shared/form-field";
+import loginBackground from "@/assets/login-campus.png";
 
 export function LoginPage() {
   const auth = useAuth();
@@ -40,11 +41,15 @@ export function LoginPage() {
     await pending;
   });
   return (
-    <main className="flex min-h-svh items-center justify-center bg-background px-4 py-6 sm:px-6 sm:py-10">
-      <div className="grid w-full max-w-5xl overflow-hidden rounded-xl border bg-card shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.08)] md:min-h-[620px] md:grid-cols-[0.44fr_0.56fr]">
+    <main
+      className="relative isolate flex min-h-svh items-center justify-center bg-slate-900 bg-cover bg-center bg-no-repeat px-4 py-8 sm:px-8 sm:py-12"
+      style={{ backgroundImage: `url(${loginBackground})` }}
+    >
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-slate-950/50" />
+      <div className="grid w-full max-w-4xl overflow-hidden rounded-xl backdrop-blur-[16px] shadow-[0_20px_50px_rgba(15,23,42,0.24),0_8px_20px_rgba(15,23,42,0.16)] md:min-h-[540px] md:grid-cols-[0.44fr_0.56fr]">
         <section
           aria-label="About SGMS"
-          className="flex flex-col bg-primary px-6 py-6 text-white sm:px-10 md:py-10"
+          className="flex flex-col bg-primary/75 px-6 py-6 text-white sm:px-8 md:py-8"
         >
           <div className="flex items-center gap-3">
             <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-white/15">
@@ -59,7 +64,7 @@ export function LoginPage() {
               </p>
             </div>
           </div>
-          <div className="my-auto hidden py-12 md:block">
+          <div className="my-auto hidden py-9 md:block">
             <h2 className="max-w-xs text-3xl font-semibold leading-tight tracking-tight">
               Academic progress,
               <br />
@@ -72,7 +77,7 @@ export function LoginPage() {
           </div>
         </section>
         <section
-          className="flex min-w-0 flex-col justify-center px-6 py-9 sm:px-10 md:px-12 md:py-12"
+          className="flex min-w-0 flex-col justify-center bg-white/65 px-6 py-7 [--muted-foreground:var(--color-slate-700)] sm:px-8 md:px-10 md:py-9"
           aria-labelledby="login-title"
         >
           <h1 id="login-title">Welcome back</h1>
@@ -164,10 +169,10 @@ export function LoginPage() {
               )}
             </Button>
           </form>
-          <p className="mt-7 text-center text-sm leading-6 text-muted-foreground">
+          <p className="mt-6 text-center text-sm leading-6 text-muted-foreground">
             Need assistance? Contact your administrator.
           </p>
-          <p className="mt-9 text-center text-xs text-muted-foreground">
+          <p className="mt-6 text-center text-xs text-muted-foreground">
             © {new Date().getFullYear()} SGMS. All rights reserved.
           </p>
         </section>

@@ -78,7 +78,7 @@ const restrictions: Partial<Record<WorkspaceResource, string>> = {
   inquiries:
     "Only Pending inquiries can be resolved. Resolution does not change a grade. Resolved inquiries cannot be reopened or deleted.",
   users:
-    "Academic relationships and the last Active Admin are protected by the backend. Existing passwords are never retrieved.",
+    "The last active Admin cannot be deactivated. Existing passwords are not shown.",
 };
 export function ManagementPage({
   resource,
@@ -412,7 +412,7 @@ export function ManagementPage({
         !canCreate && (
           <Alert tone="info" title="Creation requires available assignments">
             {policy.directoryOnly
-              ? "A permitted directory entry and valid academic assignment are required. Contact an administrator if no suitable account is available."
+              ? "Choose an eligible account. Contact an administrator if none is available."
               : resource === "subjects"
                 ? "Create or activate a Faculty account before adding a subject."
                 : "An Active Student and an existing Subject are required."}
@@ -421,10 +421,7 @@ export function ManagementPage({
       {policy.directoryOnly &&
         ["subjects", "enrollments"].includes(resource) && (
           <Alert title="Assignment validation" tone="info">
-            Account status is not exposed by the directory. The backend
-            validates whether selected accounts can be assigned. A rejected
-            request does not reveal a specific account status; contact an
-            administrator if assistance is needed.
+            Assignments require an eligible account. Contact an administrator if an assignment is rejected.
           </Alert>
         )}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
@@ -432,13 +429,11 @@ export function ManagementPage({
           <SearchInput
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            label={`Search loaded ${directory ? "directory" : resource}`}
-            scopeDescription="Search applies only to the currently loaded page. Pagination totals remain server totals."
+            label={`Search ${directory ? "directory" : resource} on this page`}
           />
           {directory && (
             <FormField
-              label="Role filter (loaded page)"
-              description="This filter applies only to records on the current page."
+              label="Role (this page)"
             >
               {(a11y) => (
                 <Select
@@ -456,7 +451,6 @@ export function ManagementPage({
           {["grades", "inquiries", "enrollments"].includes(resource) && (
             <FormField
               label="Student filter"
-              description="This filter is sent to the backend across all pages."
             >
               {(a11y) => (
                 <Select
@@ -530,7 +524,7 @@ export function ManagementPage({
         onRetry={() => void query.refetch()}
         emptyMessage={
           search || (directory && directoryRole !== "all")
-            ? "No matches on this loaded page. Clear the search or local role filter, or change pages."
+            ? "No matches on this page. Clear the search or filters, or try another page."
             : "No records were returned."
         }
         actions={(row) => (
@@ -656,7 +650,7 @@ export function ManagementPage({
       >
         <DialogContent
           title={`${singular[resource]} details`}
-          description="Read-only values from the permitted API response."
+          description="View record details."
         >
           {details.isPending ? (
             <LoadingState />
@@ -722,7 +716,7 @@ export function ManagementPage({
                   ? "Confirm this account change. Changes to your own role or status may change your access or sign you out."
                   : resource === "inquiries"
                     ? "Resolve this inquiry with the supplied note? This cannot reopen the inquiry or change its grade."
-                    : "Save these academic record changes? Existing history restrictions will be enforced by the backend."
+                    : "Save these changes?"
               }
               onSave={save}
             />

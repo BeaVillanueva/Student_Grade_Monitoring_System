@@ -214,7 +214,7 @@ export function ApplicationLayout() {
             </div>
           </div>
           <Dialog.Portal>
-            <Dialog.Overlay className="fixed inset-0 z-40 bg-slate-950/45" />
+            <Dialog.Overlay className="fixed inset-0 z-40 bg-slate-950/60" />
             <Dialog.Content className="fixed inset-y-0 left-0 z-50 w-[min(19rem,calc(100vw-2rem))] overflow-hidden bg-primary text-white shadow-xl">
               <Dialog.Title className="sr-only">SGMS navigation</Dialog.Title>
               <Dialog.Description className="sr-only">
